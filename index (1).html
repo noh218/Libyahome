@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لافتات الأدعية</title>
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --primary-dark: #1d4ed8;
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --text-color: #1e293b;
+            --border-color: #cbd5e1;
+            --error-color: #991b1b;
+            --error-bg: #fef2f2;
+            --success-color: #16a34a;
+            --success-bg: #f0fdf4;
+        }
+
+        body {
+            font-family: 'Cairo', Tahoma, sans-serif;
+            background: linear-gradient(135deg, #f0f4f8 0%, #d9e2ec 100%);
+            margin: 0;
+            padding: 20px;
+            color: var(--text-color);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .main-container {
+            max-width: 650px;
+            width: 100%;
+            margin: 0 auto;
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+            box-sizing: border-box;
+        }
+
+        h1 {
+            text-align: center;
+            color: #1e3a8a;
+            margin-bottom: 25px;
+            font-size: 26px;
+        }
+
+        /* وصف المنتج الجديد */
+        .product-description {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 14px;
+            padding: 20px;
+            margin-bottom: 25px;
+            line-height: 1.8;
+            font-size: 14px;
+        }
+
+        .product-description h3 {
+            color: #1e3a8a;
+            margin-top: 0;
+            font-size: 16px;
+        }
+
+        .product-description ul {
+            padding-right: 20px;
+            margin: 10px 0;
+        }
+
+        .product-description li {
+            margin-bottom: 6px;
+        }
+
+        /* حاوية الخيارات والصور المحدثة لتكون أطول وأوضح */
+        .options-container {
+            display: flex;
+            gap: 20px;
+            justify-content: space-between;
+            margin-bottom: 25px;
+        }
+
+        .option-label {
+            flex: 1;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .option-label input[type="radio"] {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            accent-color: var(--primary-color);
+            transform: scale(1.2);
+            cursor: pointer;
+            z-index: 10;
+        }
+
+        .option-card {
+            border: 2px solid var(--border-color);
+            border-radius: 14px;
+            padding: 15px;
+            text-align: center;
+            background: #ffffff;
+            transition: all 0.3s ease;
+            height: 100%;
+            box-sizing: border-box;
+        }
+
+        .option-label input[type="radio"]:checked+.option-card {
+            border-color: var(--primary-color);
+            background-color: #eff6ff;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.15);
+        }
+
+        .image-wrapper img {
+            width: 100%;
+            height: 180px;
+            /* زيادة الطول لتظهر جميع اللافتات بوضوح */
+            object-fit: contain;
+            /* تغيير إلى contain لضمان عدم قص أي جزء من الصورة */
+            background-color: #f1f5f9;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+
+        .option-card h2 {
+            font-size: 15px;
+            margin: 8px 0;
+            color: #334155;
+        }
+
+        .price {
+            color: var(--primary-color);
+            font-weight: bold;
+            font-size: 15px;
+        }
+
+/* صندوق الكمية */
+        .quantity-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #f1f5f9;
+            padding: 15px 20px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            border: 1px solid var(--border-color);
+            font-weight: bold;
+        }
+
+        .quantity-control {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .qty-btn {
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            width: 35px;
+            height: 35px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background 0.2s;
+        }
+
+        .qty-btn:hover {
+            background: #e2e8f0;
+        }
+
+        #quantity {
+            width: 45px;
+            text-align: center;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 6px;
+            font-size: 16px;
+            background: #fff;
+            font-weight: bold;
+        }
+
+        /* صندوق بيانات الزبون */
+        .customer-info-box {
+            border: 2px solid #334155;
+            border-radius: 14px;
+            padding: 20px;
+            margin-bottom: 25px;
+            background: #fafafa;
+        }
+
+        .customer-info-box>p {
+            text-align: center;
+            font-size: 16px;
+            font-weight: bold;
+            color: #1e293b;
+            margin-top: 0;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 10px;
+        }
+
+        .input-group {
+            position: relative;
+            margin-bottom: 15px;
+        }
+
+        .input-group .icon {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 18px;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 14px 45px 14px 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            box-sizing: border-box;
+            font-family: inherit;
+            font-size: 14px;
+            outline: none;
+            background: #fff;
+            transition: all 0.3s;
+            direction: rtl;
+            text-align: right;
+        }
+
+        .input-group input:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        /* تلوين الإطار بالأحمر الداكن عند وجود خطأ */
+        .input-group input.error-input {
+            border-color: var(--error-color) !important;
+            background-color: var(--error-bg);
+        }
+
+        /* رسائل الخطأ */
+        .error-message {
+            color: var(--error-color);
+            font-size: 12px;
+            margin-top: 5px;
+            margin-right: 5px;
+            font-weight: bold;
+            display: none;
+        }
+
+        .alert-box {
+            padding: 12px;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: bold;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .alert-error {
+            background-color: var(--error-bg);
+            color: var(--error-color);
+            border: 1px solid var(--error-color);
+        }
+
+        /* رسالة النجاح في منتصف الشاشة */
+        .success-card {
+            display: none;
+            text-align: center;
+            padding: 40px 20px;
+            background: var(--success-bg);
+            border: 2px solid var(--success-color);
+            border-radius: 16px;
+            margin: 20px 0;
+        }
+
+        .success-card h2 {
+            color: var(--success-color);
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        .success-card p {
+            color: #166534;
+            font-size: 16px;
+        }
+
+/* زر إتمام الطلب */
+        .submit-btn {
+            width: 100%;
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: opacity 0.2s, transform 0.1s;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+        }
+
+        .submit-btn:hover {
+            opacity: 0.95;
+            transform: translateY(-1px);
+        }
+
+        /* شريط الخدمات أسفل الموقع */
+        .features-bar {
+            background-color: #ffffff;
+            padding: 20px 0;
+            border-top: 1px solid #e2e8f0;
+            margin-top: 40px;
+            border-radius: 16px;
+            box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.03);
+        }
+
+        .features-container {
+            max-width: 1100px;
+            margin: 0 auto;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-around;
+            align-items: center;
+            gap: 15px;
+            text-align: center;
+        }
+
+        .feature-item {
+            flex: 1;
+            min-width: 150px;
+            padding: 10px;
+        }
+
+        .feature-icon {
+            font-size: 26px;
+            margin-bottom: 8px;
+        }
+
+        .feature-text {
+            color: #2b6cb0;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        @media (max-width: 600px) {
+            .options-container {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="main-container">
+        <h1>لافتات الأدعية</h1>
+
+        <!-- وصف المنتج الجديد -->
+        <div class="product-description">
+            <h3>🤍 انشر الدعاء… واجعل لك أثرًا يبقى</h3>
+            <p>لافتات الأدعية وسيلة بسيطة لنشر الخير وتذكير الناس بالأدعية والأذكار في الأماكن التي يمرون بها يوميًا،
+                لتكون لك صدقة جارية وأجرًا مستمرًا بإذن الله.</p>
+
+            <h3>🕌 لافتات المساجد:</h3>
+            <p><strong>4 قطع والخامسة مجاناً</strong></p>
+            <ul>
+                <li>دعاء دخول المسجد.</li>
+                <li>دعاء خروج المسجد.</li>
+                <li>دعاء دخول بيت الخلاء.</li>
+                <li>دعاء خروج بيت الخلاء.</li>
+                <li>دعاء الإنتهاء من الوضوء.</li>
+            </ul>
+
+            <h3>🛣 لافتات المنازل والمحلات:</h3>
+            <p><strong>4 قطع والخامسة مجاناً</strong></p>
+            <ul>
+                <li>الحمد لله</li>
+                <li>أستغفر الله وأتوب إليه</li>
+                <li>لا حول ولا قوة إلا بالله العلي العظيم</li>
+                <li>سبحان الله وبحمده سبحان الله العظيم</li>
+                <li>اللهم صل وسلم على سيدنا محمد</li>
+            </ul>
+
+            <h3>🌿 صدقة جارية:</h3>
+            <p>اجعل لك نصيبًا في نشر الخير، وتصدق بهذه اللافتات عن نفسك أو أحبابك لتكون لك أثرًا طيبًا يبقى.</p>
+        </div>
+
+        <!-- رسالة الخطأ العامة -->
+        <div id="generalAlert" class="alert-box alert-error"></div>
+
+        <!-- بطاقة رسالة النجاح (تظهر منفردة وتخفي الحقول) -->
+        <div id="successCard" class="success-card">
+            <h2>🎉 تم ارسال طلبك بنجاح</h2>
+            <p>شكراً لك! سنتواصل معك قريباً لتأكيد طلبك.</p>
+        </div>
+
+        <form id="orderForm" onsubmit="handleFormSubmit(event)">
+
+<!-- 1. حاوية الصورتين والخيارات -->
+            <div class="options-container">
+                <label class="option-label">
+                    <input type="radio" name="sign_option" value="masjid">
+                    <div class="option-card">
+                        <div class="image-wrapper">
+                            <img src="https://i.imgur.com/76EKGWk.jpeg" alt="لافتات المساجد">
+                        </div>
+                        <h2>لافتات المساجد</h2>
+                        <span class="price">169 د.ل</span>
+                    </div>
+                </label>
+                <label class="option-label">
+                    <input type="radio" name="sign_option" value="street_shop">
+                    <div class="option-card">
+                        <div class="image-wrapper">
+                            <img src="https://i.imgur.com/MErxsxf.jpeg" alt="لافتات المنازل والمحلات">
+                        </div>
+                        <h2>لافتات المنازل والمحلات</h2>
+                        <span class="price">139 د.ل</span>
+                    </div>
+                </label>
+            </div>
+            <div id="productError" class="error-message" style="margin-bottom: 15px; text-align: center;"></div>
+
+            <!-- 2. صندوق تحديد الكمية -->
+            <div class="quantity-section">
+                <label for="quantity">الكمية المطلوبة:</label>
+                <div class="quantity-control">
+                    <button type="button" class="qty-btn" onclick="decreaseQty()">-</button>
+                    <input type="number" id="quantity" name="quantity" value="1" min="1" max="9" readonly>
+                    <button type="button" class="qty-btn" onclick="increaseQty()">+</button>
+                </div>
+            </div>
+
+            <!-- 3. صندوق بيانات الزبون -->
+            <div class="customer-info-box">
+                <p>بيانات الزبون</p>
+
+                <div class="input-group">
+                    <span class="icon">👦</span>
+                    <input type="text" id="fullname" name="fullname" placeholder="الاسم الكامل">
+                    <div id="nameError" class="error-message">قم بتعبئة الاسم</div>
+                </div>
+
+                <div class="input-group">
+                    <span class="icon">📱</span>
+                    <input type="tel" id="phone" name="phone"
+                        placeholder="رقم الهاتف (مثال: 0912345678 أو 218... أو +218...)">
+                    <div id="phoneError" class="error-message">الرجاء إدخال رقم هاتف صحيح (يبدأ بـ 09 ويتكون من 10
+                        أرقام، أو يبدأ بـ 218 / +218 ويتكون من 12 رقماً)</div>
+                </div>
+
+                <div class="input-group">
+                    <span class="icon">📍</span>
+                    <input type="text" id="address" name="address" placeholder="العنوان الكامل">
+                    <div id="addressError" class="error-message">قم بتعبئة العنوان</div>
+                </div>
+            </div>
+
+            <!-- 4. زر إتمام الطلب -->
+            <button type="submit" class="submit-btn">اضغط هنا للطلب</button>
+        </form>
+    </div>
+
+    <!-- شريط الخدمات والمزايا أسفل الموقع -->
+    <div class="features-bar">
+        <div class="features-container">
+            <div class="feature-item">
+                <div class="feature-icon">🚚</div>
+                <div class="feature-text">شحن سريع و مجاني</div>
+            </div>
+            <div class="feature-item">
+                <div class="feature-icon">💵</div>
+                <div class="feature-text">الدفع عند الإستلام</div>
+            </div>
+            <div class="feature-item">
+                <div class="feature-icon">🛡</div>
+                <div class="feature-text">ضمان المنتج</div>
+            </div>
+            <div class="feature-item">
+                <div class="feature-icon">🎧</div>
+                <div class="feature-text">خدمة ما بعد البيع</div>
+            </div>
+        </div>
+    </div>
+
+<script>
+        function increaseQty() {
+            let qtyInput = document.getElementById('quantity');
+            let currentValue = parseInt(qtyInput.value);
+            if (currentValue < 9) {
+                qtyInput.value = currentValue + 1;
+            }
+        }
+
+        function decreaseQty() {
+            let qtyInput = document.getElementById('quantity');
+            let currentValue = parseInt(qtyInput.value);
+            if (currentValue > 1) {
+                qtyInput.value = currentValue - 1;
+            }
+        }
+
+        function handleFormSubmit(event) {
+            event.preventDefault(); // إيقاف الإرسال الافتراضي للفحص
+
+            let isValid = true;
+            // عناصر الحقول
+            let radios = document.getElementsByName('sign_option');
+            let nameInput = document.getElementById('fullname');
+            let phoneInput = document.getElementById('phone');
+            let addressInput = document.getElementById('address');
+
+            // عناصر رسائل الخطأ
+            let productError = document.getElementById('productError');
+            let nameError = document.getElementById('nameError');
+            let phoneError = document.getElementById('phoneError');
+            let addressError = document.getElementById('addressError');
+            let generalAlert = document.getElementById('generalAlert');
+
+            // إعادة تعيين الأخطاء
+            generalAlert.style.display = 'none';
+
+            nameInput.classList.remove('error-input');
+            phoneInput.classList.remove('error-input');
+            addressInput.classList.remove('error-input');
+
+            nameError.style.display = 'none';
+            phoneError.style.display = 'none';
+            addressError.style.display = 'none';
+            productError.style.display = 'none';
+
+            // 1. التحقق من اختيار نوع المنتج
+            let productSelected = false;
+            for (let r of radios) {
+                if (r.checked) {
+                    productSelected = true;
+                    break;
+                }
+            }
+            if (!productSelected) {
+                productError.innerText = 'الرجاء اختيار نوع اللافتات (المساجد أو الطرق والمحلات)';
+                productError.style.display = 'block';
+                isValid = false;
+            }
+
+            // 2. التحقق من الاسم
+            if (nameInput.value.trim() === '') {
+                nameInput.classList.add('error-input');
+                nameError.innerText = 'قم بتعبئة الاسم';
+                nameError.style.display = 'block';
+                isValid = false;
+            }
+
+            // 3. التحقق من رقم الهاتف بالتنسيقات المطلوبة
+            let phoneVal = phoneInput.value.trim();
+            // الشروط: 
+            // - يبدأ بـ 09 ويتكون من 10 أرقام
+            // - يبدأ بـ 218 ويتكون من 12 رقماً
+            // - يبدأ بـ +218 ويتكون من 12 رقماً بخلاف علامة الزائد (يعني + مع 12 رقم)
+            let phoneRegex1 = /^09\d{8}$/;                          // 09XXXXXXXX (10 أرقام)
+            let phoneRegex2 = /^218\d{9}$/;                         // 218XXXXXXXXX (12 رقماً)
+            let phoneRegex3 = /^\+218\d{9}$/;                       // +218XXXXXXXXX (+ مع 12 محتوى)
+
+            if (phoneVal === '') {
+                phoneInput.classList.add('error-input');
+                phoneError.innerText = 'قم بتعبئة الرقم';
+                phoneError.style.display = 'block';
+                isValid = false;
+            } else if (!phoneRegex1.test(phoneVal) && !phoneRegex2.test(phoneVal) && !phoneRegex3.test(phoneVal)) {
+                phoneInput.classList.add('error-input');
+                phoneError.innerText = 'الرقم غير صحيح. يجب أن يبدأ بـ 09 (10 أرقام) أو 218 / +218 (12 رقماً)';
+                phoneError.style.display = 'block';
+                isValid = false;
+            }
+
+// 4. التحقق من العنوان
+            if (addressInput.value.trim() === '') {
+                addressInput.classList.add('error-input');
+                addressError.innerText = 'قم بتعبئة العنوان';
+                addressError.style.display = 'block';
+                isValid = false;
+            }
+
+            // إذا كان كل شيء صحيحاً
+            if (isValid) {
+                // إخفاء النموذج ووصف المنتج وعرض رسالة النجاح وحدها في المنتصف
+                document.getElementById('orderForm').style.display = 'none';
+                document.querySelector('.product-description').style.display = 'none';
+                document.getElementById('successCard').style.display = 'block';
+                // التمرير بسلاسة للأعلى لرؤية رسالة النجاح
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            } else {
+                generalAlert.innerText = 'يرجى تصحيح الأخطاء وتعبئة الحقول المطلوبة وإتمام اختيار المنتج';
+                generalAlert.style.display = 'block';
+            }
+        }
+    </script>
+
+</body>
+
+</html>
