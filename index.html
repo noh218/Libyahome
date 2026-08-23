@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>صفحة الطلب</title>
+    <style>
+        :root {
+            --primary-color: #16a34a;
+            --primary-dark: #15803d;
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --text-color: #1e293b;
+            --border-color: #cbd5e1;
+            --error-color: #991b1b;
+            --error-bg: #fef2f2;
+            --success-color: #16a34a;
+            --success-bg: #f0fdf4;
+        }
+
+        body {
+            font-family: 'Cairo', Tahoma, sans-serif;
+            background: linear-gradient(135deg, #f0f4f8 0%, #d9e2ec 100%);
+            margin: 0;
+            padding: 0;
+            color: var(--text-color);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            font-size: 22px;
+        }
+
+        .main-container {
+            width: 100%;
+            margin: 0;
+            background: var(--card-bg);
+            padding: 20px 12px;
+            border-radius: 0 !important;
+            box-shadow: none;
+            box-sizing: border-box;
+        }
+
+        /* صورة البداية الأولى */
+        .top-banner-img {
+            width: 100%;
+            max-height: 350px;
+            object-fit: cover;
+            border-radius: 0 !important;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+        }
+
+        /* صورة ما بعد صندوق الزبون */
+        .after-customer-img {
+            width: 100%;
+            max-height: 350px;
+            object-fit: cover;
+            border-radius: 0 !important;
+            margin-top: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+        }
+
+        /* الشريط الأحمر للعرض */
+        .promo-banner {
+            background: linear-gradient(135deg, #dc2626, #b91c1c);
+            color: white;
+            text-align: center;
+            padding: 14px;
+            border-radius: 0 !important;
+            font-size: 22px;
+            font-weight: 800;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 15px rgba(220, 38, 38, 0.3);
+            animation: pulseBanner 2s infinite;
+        }
+
+        @keyframes pulseBanner {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.01); }
+            100% { transform: scale(1); }
+        }
+
+        /* عنوان قسم اختيار نوع اللافتة */
+        .section-title {
+            text-align: right;
+            font-size: 24px;
+            font-weight: 800;
+            color: #1e3a8a;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            padding-right: 5px;
+        }
+
+        /* تصميم خيارات المنتجات جنباً إلى جنب */
+        .options-container {
+            display: flex;
+            gap: 4px;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .option-label {
+            flex: 1;
+            position: relative;
+            cursor: pointer;
+        }
+
+        /* إخفاء زر الراديو الأصلي تماماً */
+        .option-label input[type="radio"] {
+            position: absolute;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        /* الحالة الافتراضية (غير مختار): إطار رمادي ودائرة رمادية بدون صح */
+        .option-card {
+            border: 2px solid var(--border-color);
+            border-radius: 0 !important;
+            padding: 12px 8px;
+            text-align: center;
+            transition: all 0.3s ease;
+            height: 100%;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            background: #ffffff;
+        }
+
+        .custom-radio-circle {
+            width: 36px;
+            height: 36px;
+            border-radius: 50% !important;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #94a3b8; /* دائرة رمادية افتراضياً */
+            transition: background-color 0.3s;
+        }
+
+        .custom-radio-circle::after {
+            content: '';
+            display: none;
+        }
+
+        /* الحالة عند الاختيار (Checked): إطار أخضر، خلفية خضراء فاتحة، دائرة خضراء وعليها صح بيضاء */
+        .option-label input[type="radio"]:checked + .option-card {
+            background: #f0fdf4;
+            border-color: var(--primary-color);
+        }
+
+        .option-label input[type="radio"]:checked + .option-card .custom-radio-circle {
+            background-color: #16a34a; /* دائرة خضراء */
+        }
+
+        .option-label input[type="radio"]:checked + .option-card .custom-radio-circle::after {
+            content: '✓';
+            color: white;
+            font-size: 20px;
+            font-weight: bold;
+            display: block;
+        }
+
+        .image-wrapper img {
+            width: 100%;
+            height: 170px;
+            object-fit: contain;
+            background-color: #ffffff;
+            border-radius: 0 !important;
+            margin-bottom: 8px;
+        }
+
+        .option-card h2 {
+            font-size: 20px;
+            margin: 8px 0 4px 0;
+            color: #1e293b;
+            font-weight: 800;
+        }
+
+        .price {
+            color: var(--primary-color);
+            font-weight: 800;
+            font-size: 22px;
+            margin-bottom: 10px;
+        }
+
+        /* صندوق معلومات التوصيل */
+        .customer-info-box {
+            border: 3px solid #111827;
+            border-radius: 0 !important;
+            padding: 20px 12px;
+            margin-bottom: 10px;
+            background: #ffffff;
+            position: relative;
+        }
+
+        .customer-info-header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 15px;
+            font-size: 26px;
+            font-weight: 800;
+            color: #111827;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .form-group {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            font-size: 17px;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 6px;
+            text-align: right;
+        }
+
+        .form-group label .required {
+            color: #dc2626;
+            margin-right: 3px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 0 !important;
+            font-family: inherit;
+            font-size: 17px;
+            outline: none;
+            background: #fff;
+            color: #1e293b;
+            transition: all 0.3s;
+            direction: rtl;
+            text-align: right;
+            box-sizing: border-box;
+            height: 50px;
+        }
+
+        .form-group input::placeholder {
+            color: #9ca3af;
+        }
+
+        .form-group input:focus {
+            border-color: #111827;
+            box-shadow: 0 0 0 2px rgba(17, 24, 39, 0.1);
+        }
+
+        .form-group input.error-input {
+            border-color: var(--error-color) !important;
+            background-color: var(--error-bg);
+        }
+
+        .error-message {
+            color: var(--error-color);
+            font-size: 15px;
+            margin-top: 5px;
+            font-weight: bold;
+            display: none;
+            text-align: right;
+        }
+
+        /* قسم الكمية والزر السفلي */
+        .order-action-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        .submit-btn {
+            flex: 2;
+            background: linear-gradient(135deg, #16a34a, #15803d);
+            color: white;
+            border: none;
+            padding: 14px;
+            border-radius: 0 !important;
+            font-size: 22px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: opacity 0.2s, transform 0.1s;
+            box-shadow: 0 4px 12px rgba(22, 163, 74, 0.3);
+            text-align: center;
+            height: 56px;
+        }
+
+        .submit-btn:hover {
+            opacity: 0.95;
+            transform: translateY(-1px);
+        }
+
+        .quantity-control-box {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #f8fafc;
+            border: 1px solid var(--border-color);
+            border-radius: 0 !important;
+            padding: 4px 10px;
+            height: 56px;
+            box-sizing: border-box;
+        }
+
+        .qty-btn {
+            background: transparent;
+            border: none;
+            width: 34px;
+            height: 34px;
+            border-radius: 0 !important;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 22px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #1e3a8a;
+            transition: background 0.2s;
+        }
+
+        .qty-btn:hover {
+            background: #e2e8f0;
+        }
+
+        #quantity {
+            width: 34px;
+            text-align: center;
+            border: none;
+            background: transparent;
+            font-size: 22px;
+            font-weight: bold;
+            color: #1e293b;
+            outline: none;
+        }
+
+        .alert-box {
+            padding: 14px;
+            border-radius: 0 !important;
+            text-align: center;
+            font-weight: bold;
+            margin-bottom: 15px;
+            font-size: 18px;
+            display: none;
+        }
+
+        .alert-error {
+            background-color: var(--error-bg);
+            color: var(--error-color);
+            border: 1px solid var(--error-color);
+        }
+
+        .success-card {
+            display: none;
+            text-align: center;
+            padding: 30px 15px;
+            background: var(--success-bg);
+            border: 2px solid var(--success-color);
+            border-radius: 0 !important;
+            margin: 15px 0;
+        }
+
+        .success-card h2 {
+            color: var(--success-color);
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .success-card p {
+            color: #166534;
+            font-size: 22px;
+        }
+
+        /* وصف المنتج في الأسفل */
+        .product-description {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 0 !important;
+            padding: 20px 12px;
+            margin-top: 30px;
+            line-height: 1.8;
+            font-size: 20px;
+            text-align: right;
+        }
+
+        .product-description h3 {
+            color: #1e3a8a;
+            margin-top: 0;
+            font-size: 22px;
+        }
+
+        .product-description ul {
+            padding-right: 20px;
+            margin: 8px 0;
+        }
+
+        .product-description li {
+            margin-bottom: 6px;
+            font-size: 20px;
+            color: #1e293b;
+        }
+
+        .features-bar {
+            background-color: #ffffff;
+            padding: 15px 0;
+            border-top: 1px solid #e2e8f0;
+            margin-top: 30px;
+            border-radius: 0 !important;
+            box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.03);
+            width: 100%;
+        }
+
+        .features-container {
+            width: 100%;
+            margin: 0 auto;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-around;
+            align-items: center;
+            gap: 10px;
+            text-align: center;
+        }
+
+        .feature-item {
+            flex: 1;
+            min-width: 130px;
+            padding: 8px;
+        }
+
+        .feature-icon {
+            font-size: 30px;
+            margin-bottom: 6px;
+        }
+
+        .feature-text {
+            color: #2b6cb0;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .bottom-title {
+            text-align: center;
+            font-size: 28px;
+            font-weight: 800;
+            color: #1e3a8a;
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="main-container">
+        <!-- الصورة الأولى -->
+        <img src="https://i.imgur.com/wt7e8pg.png" alt="لافتات الأدعية" class="top-banner-img">
+
+        <!-- الشريط الأحمر -->
+        <div class="promo-banner">
+            عرض لفترة محدودة: 4 قطع والخامسة مجاناً
+        </div>
+
+        <div id="generalAlert" class="alert-box alert-error"></div>
+
+        <div id="successCard" class="success-card">
+            <h2>🎉 تم ارسال طلبك بنجاح</h2>
+            <p>شكراً لك! سنتواصل معك قريباً لتأكيد طلبك.</p>
+        </div>
+
+        <form id="orderForm" onsubmit="handleFormSubmit(event)">
+
+            <!-- نص اختر نوع اللافتة -->
+            <div class="section-title">📌 اختر نوع اللافتة</div>
+
+            <!-- خيارات المنتجات -->
+            <div class="options-container">
+                <!-- الخيار الأول: لافتات المساجد (مختارة افتراضياً) -->
+                <label class="option-label">
+                    <input type="radio" name="sign_type" value="لافتات المساجد" checked>
+                    <div class="option-card">
+                        <div class="image-wrapper">
+                            <img src="https://i.imgur.com/kHZ0Vw0.png" alt="لافتات المساجد">
+                        </div>
+                        <h2>لافتات المساجد</h2>
+                        <span class="price">165 د.ل</span>
+                        <div class="custom-radio-circle"></div>
+                    </div>
+                </label>
+
+                <!-- الخيار الثاني: لافتات المنازل والمحلات -->
+                <label class="option-label">
+                    <input type="radio" name="sign_type" value="لافتات المنازل والمحلات">
+                    <div class="option-card">
+                        <div class="image-wrapper">
+                            <img src="https://i.imgur.com/vNOBqje.png" alt="لافتات المنازل والمحلات">
+                        </div>
+                        <h2>لافتات المنازل والمحلات</h2>
+                        <span class="price">135 د.ل</span>
+                        <div class="custom-radio-circle"></div>
+                    </div>
+                </label>
+            </div>
+
+            <!-- صندوق بيانات الزبون -->
+            <div class="customer-info-box">
+                <div class="customer-info-header">
+                    <span>👤</span>
+                    <span>معلومات التوصيل</span>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="fullname">الإسم الكامل <span class="required">*</span></label>
+                        <input type="text" id="fullname" name="fullname" placeholder="أكتب إسمك الكامل">
+                        <div id="nameError" class="error-message">قم بتعبئة الاسم</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="phone">رقم الهاتف <span class="required">*</span></label>
+                        <input type="tel" id="phone" name="phone" placeholder="أكتب رقم الهاتف">
+                        <div id="phoneError" class="error-message">قم بتعبئة رقم الهاتف</div>
+                    </div>
+                </div>
+
+                <div class="form-row" style="margin-bottom: 0;">
+                    <div class="form-group" style="flex: 100%;">
+                        <label for="address">العنوان <span class="required">*</span></label>
+                        <input type="text" id="address" name="address" placeholder="العنوان">
+                        <div id="addressError" class="error-message">قم بتعبئة العنوان</div>
+                    </div>
+                </div>
+
+                <div class="order-action-row">
+                    <button type="submit" class="submit-btn" id="submitBtn">أطلب الآن</button>
+                    <div class="quantity-control-box">
+                        <button type="button" class="qty-btn" onclick="decreaseQty()">-</button>
+                        <input type="number" id="quantity" name="quantity" value="1" min="1" max="9" readonly>
+                        <button type="button" class="qty-btn" onclick="increaseQty()">+</button>
+                    </div>
+                </div>
+            </div>
+
+        </form>
+
+        <!-- الصورة الثانية -->
+        <img src="https://i.imgur.com/ztXoEPy.png" alt="صورة إضافية" class="after-customer-img">
+
+        <!-- عبارة لافتات الأدعية تحت آخر صورة -->
+        <div class="bottom-title">لافتات الأدعية</div>
+
+        <!-- وصف المنتج والتفاصيل في الأسفل -->
+        <div class="product-description">
+            <h3>🤍 انشر الدعاء… واجعل لك أثرًا يبقى</h3>
+            <p>لافتات الأدعية وسيلة بسيطة لنشر الخير وتذكير الناس بالأدعية والأذكار في الأماكن التي يمرون بها يوميًا، لتكون لك صدقة جارية وأجرًا مستمرًا بإذن الله.</p>
+
+            <h3>🕌 لافتات المساجد:</h3>
+            <p><strong>4 قطع والخامسة مجاناً</strong></p>
+            <ul>
+                <li>دعاء دخول المسجد.</li>
+                <li>دعاء خروج المسجد.</li>
+                <li>دعاء دخول بيت الخلاء.</li>
+                <li>دعاء خروج بيت الخلاء.</li>
+                <li>دعاء الإنتهاء من الوضوء.</li>
+            </ul>
+
+            <h3>🛣 لافتات المنازل والمحلات:</h3>
+            <p><strong>4 قطع والخامسة مجاناً</strong></p>
+            <ul>
+                <li>الحمد لله</li>
+                <li>أستغفر الله وأتوب إليه</li>
+                <li>لا حول ولا قوة إلا بالله العلي العظيم</li>
+                <li>سبحان الله وبحمده سبحان الله العظيم</li>
+                <li>اللهم صل وسلم على سيدنا محمد</li>
+            </ul>
+
+            <h3>🌿 صدقة جارية:</h3>
+            <p>اجعل لك نصيبًا في نشر الخير، وتصدق بهذه اللافتات عن نفسك أو أحبابك لتكون لك أثرًا طيبًا يبقى.</p>
+        </div>
+
+    </div>
+
+    <div class="features-bar">
+        <div class="features-container">
+            <div class="feature-item">
+                <div class="feature-icon">🚚</div>
+                <div class="feature-text">شحن سريع و مجاني</div>
+            </div>
+            <div class="feature-item">
+                <div class="feature-icon">💵</div>
+                <div class="feature-text">الدفع عند الإستلام</div>
+            </div>
+            <div class="feature-item">
+                <div class="feature-icon">🛡</div>
+                <div class="feature-text">ضمان المنتج</div>
+            </div>
+            <div class="feature-item">
+                <div class="feature-icon">🎧</div>
+                <div class="feature-text">خدمة ما بعد البيع</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function increaseQty() {
+            let qtyInput = document.getElementById('quantity');
+            let currentValue = parseInt(qtyInput.value);
+            if (currentValue < 9) {
+                qtyInput.value = currentValue + 1;
+            }
+        }
+
+        function decreaseQty() {
+            let qtyInput = document.getElementById('quantity');
+            let currentValue = parseInt(qtyInput.value);
+            if (currentValue > 1) {
+                qtyInput.value = currentValue - 1;
+            }
+        }
+
+        function handleFormSubmit(event) {
+            event.preventDefault();
+
+            let isValid = true;
+            let nameInput = document.getElementById('fullname');
+            let phoneInput = document.getElementById('phone');
+            let addressInput = document.getElementById('address');
+
+            let nameError = document.getElementById('nameError');
+            let phoneError = document.getElementById('phoneError');
+            let addressError = document.getElementById('addressError');
+            let generalAlert = document.getElementById('generalAlert');
+
+            // إعادة ضبط الأخطاء في البداية
+            generalAlert.style.display = 'none';
+            nameInput.classList.remove('error-input');
+            phoneInput.classList.remove('error-input');
+            addressInput.classList.remove('error-input');
+
+            nameError.style.display = 'none';
+            phoneError.style.display = 'none';
+            addressError.style.display = 'none';
+
+            // 1. التحقق من حقل الاسم
+            if (nameInput.value.trim() === '') {
+                nameInput.classList.add('error-input');
+                nameError.innerText = 'قم بتعبئة الاسم الكامل';
+                nameError.style.display = 'block';
+                isValid = false;
+            }
+
+            // 2. التحقق من حقل رقم الهاتف
+            let phoneVal = phoneInput.value.trim();
+            let phoneRegex1 = /^09\d{8}$/;
+            let phoneRegex2 = /^218\d{9}$/;
+            let phoneRegex3 = /^\+218\d{9}$/;
+
+            if (phoneVal === '') {
+                phoneInput.classList.add('error-input');
+                phoneError.innerText = 'قم بتعبئة رقم الهاتف';
+                phoneError.style.display = 'block';
+                isValid = false;
+            } else if (!phoneRegex1.test(phoneVal) && !phoneRegex2.test(phoneVal) && !phoneRegex3.test(phoneVal)) {
+                phoneInput.classList.add('error-input');
+                phoneError.innerText = 'الرقم غير صحيح. يجب أن يبدأ بـ 09 (10 أرقام) أو 218 / +218';
+                phoneError.style.display = 'block';
+                isValid = false;
+            }
+
+            // 3. التحقق من حقل العنوان
+            if (addressInput.value.trim() === '') {
+                addressInput.classList.add('error-input');
+                addressError.innerText = 'قم بتعبئة العنوان بالتفصيل';
+                addressError.style.display = 'block';
+                isValid = false;
+            }
+
+            // إذا كانت جميع الحقول صحيحة ومكتملة
+            if (isValid) {
+                let submitBtn = document.getElementById('submitBtn');
+                submitBtn.innerText = 'جاري الإرسال...';
+                submitBtn.disabled = true;
+
+                const scriptURL = "https://script.google.com/macros/s/AKfycbyEDKfheAVEJyxqD7BRPciKlCKY2RhTUaSP5fctTox4n0mP3hGlm-u_oF9DSa5Bb-eBBQ/exec";
+
+                // الحصول على نوع اللافتة المختار
+                let selectedSign = document.querySelector('input[name="sign_type"]:checked').value;
+
+                const formData = {
+                    product: selectedSign,
+                    quantity: document.getElementById('quantity').value,
+                    name: nameInput.value.trim(),
+                    phone: phoneInput.value.trim(),
+                    address: addressInput.value.trim()
+                };
+
+                fetch(scriptURL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                })
+                .then(response => {
+                    document.getElementById('orderForm').style.display = 'none';
+                    document.querySelector('.after-customer-img').style.display = 'none';
+                    document.querySelector('.bottom-title').style.display = 'none';
+                    document.querySelector('.product-description').style.display = 'none';
+                    document.getElementById('successCard').style.display = 'block';
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                })
+                .catch(error => {
+                    submitBtn.innerText = 'أطلب الآن';
+                    submitBtn.disabled = false;
+                    generalAlert.innerText = 'حدث خطأ أثناء الإرسال، يرجى المحاولة مرة أخرى.';
+                    generalAlert.style.display = 'block';
+                });
+            } else {
+                generalAlert.innerText = 'يرجى تصحيح الأخطاء وتعبئة جميع الحقول المطلوبة باللون الأحمر';
+                generalAlert.style.display = 'block';
+            }
+        }
+    </script>
+
+</body>
+
+</html>
