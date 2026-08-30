@@ -1,0 +1,928 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>صفحة الطلب</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+    <!--
+        ====== إعدادات الموقع (CONFIG) ======
+        غيّر القيم هنا فقط عند الحاجة، بدون لمس بقية الكود.
+    -->
+    <script>
+        const CONFIG = {
+            // رابط Google Apps Script اللي يجيب المنتجات من الشيت (لوحة التحكم)
+            // اتركه فاضي "" لحد ما تجهزه، وبكذا الموقع يشتغل بالمنتجين الافتراضيين
+            PRODUCTS_API_URL: "",
+
+            // رابط استلام الطلبات (نفس اللي كان موجود سابقاً)
+            ORDER_API_URL: "https://script.google.com/macros/s/AKfycbyEDKfheAVEJyxqD7BRPciKlCKY2RhTUaSP5fctTox4n0mP3hGlm-u_oF9DSa5Bb-eBBQ/exec",
+
+            // رقم الواتساب بصيغة دولية بدون + أو صفر (218 = ليبيا)
+            WHATSAPP_NUMBER: "218928889689",
+
+            // رقم بكسل الميتا (Meta Pixel ID) - حطه هنا لما يوصلك من الممول
+            META_PIXEL_ID: ""
+        };
+    </script>
+
+    <!-- Meta Pixel Code (يتحمّل فقط لما تحط META_PIXEL_ID) -->
+    <script>
+        if (CONFIG.META_PIXEL_ID) {
+            !function(f,b,e,v,n,t,s)
+            {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+            n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+            if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+            n.queue=[];t=b.createElement(e);t.async=!0;
+            t.src=v;s=b.getElementsByTagName(e)[0];
+            s.parentNode.insertBefore(t,s)}(window, document,'script',
+            'https://connect.facebook.net/en_US/fbevents.js');
+            fbq('init', CONFIG.META_PIXEL_ID);
+            fbq('track', 'PageView');
+        }
+    </script>
+    <!-- End Meta Pixel Code -->
+
+    <style>
+        :root {
+            --primary-color: #16a34a;
+            --primary-dark: #15803d;
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --text-color: #1e293b;
+            --border-color: #cbd5e1;
+            --error-color: #991b1b;
+            --error-bg: #fef2f2;
+            --success-color: #16a34a;
+            --success-bg: #f0fdf4;
+        }
+
+        body {
+            font-family: 'Cairo', Tahoma, sans-serif;
+            background: linear-gradient(135deg, #f0f4f8 0%, #d9e2ec 100%);
+            margin: 0;
+            padding: 0;
+            color: var(--text-color);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            font-size: 22px;
+        }
+
+        .main-container {
+            width: 100%;
+            margin: 0;
+            background: var(--card-bg);
+            padding: 20px 12px;
+            border-radius: 0 !important;
+            box-shadow: none;
+            box-sizing: border-box;
+        }
+
+        /* صورة البداية الأولى */
+        .top-banner-img {
+            width: 100%;
+            max-height: 350px;
+            object-fit: cover;
+            border-radius: 0 !important;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+        }
+
+        /* صورة ما بعد صندوق الزبون */
+        .after-customer-img {
+            width: 100%;
+            max-height: 350px;
+            object-fit: cover;
+            border-radius: 0 !important;
+            margin-top: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+        }
+
+        /* الشريط الأحمر للعرض */
+        .promo-banner {
+            background: linear-gradient(135deg, #dc2626, #b91c1c);
+            color: white;
+            text-align: center;
+            padding: 14px;
+            border-radius: 0 !important;
+            font-size: 22px;
+            font-weight: 800;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 15px rgba(220, 38, 38, 0.3);
+            animation: pulseBanner 2s infinite;
+        }
+
+        @keyframes pulseBanner {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.01); }
+            100% { transform: scale(1); }
+        }
+
+        /* عنوان قسم اختيار نوع اللافتة */
+        .section-title {
+            text-align: right;
+            font-size: 24px;
+            font-weight: 800;
+            color: #1e3a8a;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            padding-right: 5px;
+        }
+
+        /* تصميم خيارات المنتجات جنباً إلى جنب */
+        .options-container {
+            display: flex;
+            gap: 4px;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .option-label {
+            flex: 1;
+            position: relative;
+            cursor: pointer;
+        }
+
+        /* إخفاء خانة الاختيار الأصلية تماماً */
+        .option-label input {
+            position: absolute;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        /* الحالة الافتراضية (غير مختار): إطار رمادي ودائرة رمادية بدون صح */
+        .option-card {
+            border: 2px solid var(--border-color);
+            border-radius: 0 !important;
+            padding: 12px 8px;
+            text-align: center;
+            transition: all 0.3s ease;
+            height: 100%;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            background: #ffffff;
+        }
+
+        .custom-radio-circle {
+            width: 36px;
+            height: 36px;
+            border-radius: 50% !important;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #94a3b8; /* دائرة رمادية افتراضياً */
+            transition: background-color 0.3s;
+        }
+
+        .custom-radio-circle::after {
+            content: '';
+            display: none;
+        }
+
+        /* الحالة عند الاختيار (Checked): إطار أخضر، خلفية خضراء فاتحة، دائرة خضراء وعليها صح بيضاء */
+        .option-label input:checked + .option-card {
+            background: #f0fdf4;
+            border-color: var(--primary-color);
+            box-shadow: 0 4px 14px rgba(22, 163, 74, 0.15);
+        }
+
+        .option-label input:checked + .option-card .custom-radio-circle {
+            background-color: #16a34a; /* دائرة خضراء */
+        }
+
+        .option-label input:checked + .option-card .custom-radio-circle::after {
+            content: '✓';
+            color: white;
+            font-size: 20px;
+            font-weight: bold;
+            display: block;
+        }
+
+        .option-card:hover {
+            border-color: #94a3b8;
+        }
+
+        /* رسالة توضح إنه يمكن اختيار أكثر من نوع */
+        .section-hint {
+            text-align: right;
+            font-size: 15px;
+            color: #64748b;
+            margin-top: -10px;
+            margin-bottom: 15px;
+            padding-right: 5px;
+        }
+
+        .image-wrapper img {
+            width: 100%;
+            height: 170px;
+            object-fit: contain;
+            background-color: #ffffff;
+            border-radius: 0 !important;
+            margin-bottom: 8px;
+        }
+
+        .option-card h2 {
+            font-size: 20px;
+            margin: 8px 0 4px 0;
+            color: #1e293b;
+            font-weight: 800;
+        }
+
+        .price {
+            color: var(--primary-color);
+            font-weight: 800;
+            font-size: 22px;
+            margin-bottom: 10px;
+        }
+
+        /* صندوق معلومات التوصيل */
+        .customer-info-box {
+            border: 3px solid #111827;
+            border-radius: 0 !important;
+            padding: 20px 12px;
+            margin-bottom: 10px;
+            background: #ffffff;
+            position: relative;
+        }
+
+        .customer-info-header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 15px;
+            font-size: 26px;
+            font-weight: 800;
+            color: #111827;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .form-group {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            font-size: 17px;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 6px;
+            text-align: right;
+        }
+
+        .form-group label .required {
+            color: #dc2626;
+            margin-right: 3px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 0 !important;
+            font-family: inherit;
+            font-size: 17px;
+            outline: none;
+            background: #fff;
+            color: #1e293b;
+            transition: all 0.3s;
+            direction: rtl;
+            text-align: right;
+            box-sizing: border-box;
+            height: 50px;
+        }
+
+        .form-group input::placeholder {
+            color: #9ca3af;
+        }
+
+        .form-group input:focus {
+            border-color: #111827;
+            box-shadow: 0 0 0 2px rgba(17, 24, 39, 0.1);
+        }
+
+        .form-group input.error-input {
+            border-color: var(--error-color) !important;
+            background-color: var(--error-bg);
+        }
+
+        .error-message {
+            color: var(--error-color);
+            font-size: 15px;
+            margin-top: 5px;
+            font-weight: bold;
+            display: none;
+            text-align: right;
+        }
+
+        /* قسم الكمية والزر السفلي */
+        .order-action-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        .submit-btn {
+            flex: 2;
+            background: linear-gradient(135deg, #16a34a, #15803d);
+            color: white;
+            border: none;
+            padding: 14px;
+            border-radius: 0 !important;
+            font-size: 22px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: opacity 0.2s, transform 0.1s;
+            box-shadow: 0 4px 12px rgba(22, 163, 74, 0.3);
+            text-align: center;
+            height: 56px;
+        }
+
+        .submit-btn:hover {
+            opacity: 0.95;
+            transform: translateY(-1px);
+        }
+
+        .quantity-control-box {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #f8fafc;
+            border: 1px solid var(--border-color);
+            border-radius: 0 !important;
+            padding: 4px 10px;
+            height: 56px;
+            box-sizing: border-box;
+        }
+
+        .qty-btn {
+            background: transparent;
+            border: none;
+            width: 34px;
+            height: 34px;
+            border-radius: 0 !important;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 22px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #1e3a8a;
+            transition: background 0.2s;
+        }
+
+        .qty-btn:hover {
+            background: #e2e8f0;
+        }
+
+        #quantity {
+            width: 34px;
+            text-align: center;
+            border: none;
+            background: transparent;
+            font-size: 22px;
+            font-weight: bold;
+            color: #1e293b;
+            outline: none;
+        }
+
+        /* مربع الإجمالي */
+        .total-box {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #f0fdf4;
+            border: 2px solid var(--primary-color);
+            border-radius: 0 !important;
+            padding: 12px 16px;
+            margin-top: 14px;
+            font-size: 20px;
+            font-weight: 800;
+            color: #14532d;
+        }
+
+        .total-box span.total-amount {
+            font-size: 24px;
+            color: var(--primary-color);
+        }
+
+        /* زر الواتساب العائم */
+        .whatsapp-float {
+            position: fixed;
+            bottom: 22px;
+            right: 22px;
+            width: 60px;
+            height: 60px;
+            background: #25D366;
+            border-radius: 50% !important;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
+            z-index: 999;
+            transition: transform 0.2s ease;
+            text-decoration: none;
+        }
+
+        .whatsapp-float:hover {
+            transform: scale(1.08);
+        }
+
+        .whatsapp-float svg {
+            width: 32px;
+            height: 32px;
+        }
+
+        .alert-box {
+            padding: 14px;
+            border-radius: 0 !important;
+            text-align: center;
+            font-weight: bold;
+            margin-bottom: 15px;
+            font-size: 18px;
+            display: none;
+        }
+
+        .alert-error {
+            background-color: var(--error-bg);
+            color: var(--error-color);
+            border: 1px solid var(--error-color);
+        }
+
+        .success-card {
+            display: none;
+            text-align: center;
+            padding: 30px 15px;
+            background: var(--success-bg);
+            border: 2px solid var(--success-color);
+            border-radius: 0 !important;
+            margin: 15px 0;
+        }
+
+        .success-card h2 {
+            color: var(--success-color);
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .success-card p {
+            color: #166534;
+            font-size: 22px;
+        }
+
+        /* وصف المنتج في الأسفل */
+        .product-description {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 0 !important;
+            padding: 20px 12px;
+            margin-top: 30px;
+            line-height: 1.8;
+            font-size: 20px;
+            text-align: right;
+        }
+
+        .product-description h3 {
+            color: #1e3a8a;
+            margin-top: 0;
+            font-size: 22px;
+        }
+
+        .product-description ul {
+            padding-right: 20px;
+            margin: 8px 0;
+        }
+
+        .product-description li {
+            margin-bottom: 6px;
+            font-size: 20px;
+            color: #1e293b;
+        }
+
+        .features-bar {
+            background-color: #ffffff;
+            padding: 15px 0;
+            border-top: 1px solid #e2e8f0;
+            margin-top: 30px;
+            border-radius: 0 !important;
+            box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.03);
+            width: 100%;
+        }
+
+        .features-container {
+            width: 100%;
+            margin: 0 auto;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-around;
+            align-items: center;
+            gap: 10px;
+            text-align: center;
+        }
+
+        .feature-item {
+            flex: 1;
+            min-width: 130px;
+            padding: 8px;
+        }
+
+        .feature-icon {
+            font-size: 30px;
+            margin-bottom: 6px;
+        }
+
+        .feature-text {
+            color: #2b6cb0;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .bottom-title {
+            text-align: center;
+            font-size: 28px;
+            font-weight: 800;
+            color: #1e3a8a;
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="main-container">
+        <!-- الصورة الأولى -->
+        <img src="https://i.imgur.com/wt7e8pg.png" alt="لافتات الأدعية" class="top-banner-img">
+
+        <div id="generalAlert" class="alert-box alert-error"></div>
+
+        <div id="successCard" class="success-card">
+            <h2>🎉 تم ارسال طلبك بنجاح</h2>
+            <p>شكراً لك! سنتواصل معك قريباً لتأكيد طلبك.</p>
+        </div>
+
+        <form id="orderForm" onsubmit="handleFormSubmit(event)">
+
+            <!-- نص اختر نوع اللافتة -->
+            <div class="section-title">📌 اختر نوع اللافتة</div>
+            <div class="section-hint">يمكنك اختيار أكثر من نوع في نفس الطلب</div>
+
+            <!-- خيارات المنتجات: تُبنى تلقائياً بواسطة JS من دالة renderProducts() -->
+            <div class="options-container" id="optionsContainer"></div>
+
+            <!-- صندوق بيانات الزبون -->
+            <div class="customer-info-box">
+                <div class="customer-info-header">
+                    <span>👤</span>
+                    <span>معلومات التوصيل</span>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="fullname">الإسم الكامل <span class="required">*</span></label>
+                        <input type="text" id="fullname" name="fullname" placeholder="أكتب إسمك الكامل">
+                        <div id="nameError" class="error-message">قم بتعبئة الاسم</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="phone">رقم الهاتف <span class="required">*</span></label>
+                        <input type="tel" id="phone" name="phone" placeholder="أكتب رقم الهاتف">
+                        <div id="phoneError" class="error-message">قم بتعبئة رقم الهاتف</div>
+                    </div>
+                </div>
+
+                <div class="form-row" style="margin-bottom: 0;">
+                    <div class="form-group" style="flex: 100%;">
+                        <label for="address">العنوان <span class="required">*</span></label>
+                        <input type="text" id="address" name="address" placeholder="العنوان">
+                        <div id="addressError" class="error-message">قم بتعبئة العنوان</div>
+                    </div>
+                </div>
+
+                <div class="order-action-row">
+                    <button type="submit" class="submit-btn" id="submitBtn">أطلب الآن</button>
+                    <div class="quantity-control-box">
+                        <button type="button" class="qty-btn" onclick="decreaseQty()">-</button>
+                        <input type="number" id="quantity" name="quantity" value="1" min="1" max="9" readonly>
+                        <button type="button" class="qty-btn" onclick="increaseQty()">+</button>
+                    </div>
+                </div>
+
+                <!-- مربع الإجمالي -->
+                <div class="total-box">
+                    <span>الإجمالي</span>
+                    <span class="total-amount" id="totalAmount">0 د.ل</span>
+                </div>
+            </div>
+
+            <!-- الشريط الأحمر: مباشرة تحت صندوق بيانات الزبون -->
+            <div class="promo-banner">
+                📌عرض لفترة محدودة التوصيل مجاني
+            </div>
+
+        </form>
+
+        <!-- الصورة الثانية -->
+        <img src="https://i.imgur.com/ztXoEPy.png" alt="صورة إضافية" class="after-customer-img" loading="lazy">
+
+        <!-- عبارة لافتات الأدعية تحت آخر صورة -->
+        <div class="bottom-title">لافتات الأدعية</div>
+
+        <!-- وصف المنتج والتفاصيل في الأسفل -->
+        <div class="product-description">
+            <h3>🤍 انشر الدعاء… واجعل لك أثرًا يبقى</h3>
+            <p>لافتات الأدعية وسيلة بسيطة لنشر الخير وتذكير الناس بالأدعية والأذكار في الأماكن التي يمرون بها يوميًا، لتكون لك صدقة جارية وأجرًا مستمرًا بإذن الله.</p>
+
+            <h3>🕌 لافتات المساجد:</h3>
+            <p><strong>4 قطع والخامسة مجاناً</strong></p>
+            <ul>
+                <li>دعاء دخول المسجد.</li>
+                <li>دعاء خروج المسجد.</li>
+                <li>دعاء دخول بيت الخلاء.</li>
+                <li>دعاء خروج بيت الخلاء.</li>
+                <li>دعاء الإنتهاء من الوضوء.</li>
+            </ul>
+
+            <h3>🛣 لافتات المنازل والمحلات:</h3>
+            <p><strong>4 قطع والخامسة مجاناً</strong></p>
+            <ul>
+                <li>الحمد لله</li>
+                <li>أستغفر الله وأتوب إليه</li>
+                <li>لا حول ولا قوة إلا بالله العلي العظيم</li>
+                <li>سبحان الله وبحمده سبحان الله العظيم</li>
+                <li>اللهم صل وسلم على سيدنا محمد</li>
+            </ul>
+
+            <h3>🌿 صدقة جارية:</h3>
+            <p>اجعل لك نصيبًا في نشر الخير، وتصدق بهذه اللافتات عن نفسك أو أحبابك لتكون لك أثرًا طيبًا يبقى.</p>
+        </div>
+
+    </div>
+
+    <div class="features-bar">
+        <div class="features-container">
+            <div class="feature-item">
+                <div class="feature-icon">🚚</div>
+                <div class="feature-text">شحن سريع و مجاني</div>
+            </div>
+            <div class="feature-item">
+                <div class="feature-icon">💵</div>
+                <div class="feature-text">الدفع عند الإستلام</div>
+            </div>
+            <div class="feature-item">
+                <div class="feature-icon">🛡</div>
+                <div class="feature-text">ضمان المنتج</div>
+            </div>
+            <div class="feature-item">
+                <div class="feature-icon">🎧</div>
+                <div class="feature-text">خدمة ما بعد البيع</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- زر الواتساب العائم -->
+    <a id="whatsappBtn" class="whatsapp-float" href="#" target="_blank" rel="noopener" aria-label="تواصل عبر واتساب">
+        <svg viewBox="0 0 32 32" fill="white" xmlns="http://www.w3.org/2000/svg">
+            <path d="M16.004 3C9.373 3 4 8.373 4 15.004c0 2.35.687 4.54 1.87 6.39L4 29l7.79-1.84a11.94 11.94 0 0 0 4.214.76h.005C22.64 27.92 28 22.548 28 15.917 28 9.286 22.64 3 16.004 3zm0 21.77h-.004a9.9 9.9 0 0 1-5.05-1.38l-.362-.215-4.62 1.09 1.113-4.5-.236-.37a9.86 9.86 0 0 1-1.51-5.29c0-5.46 4.44-9.9 9.914-9.9 2.648 0 5.135 1.033 7.006 2.906a9.84 9.84 0 0 1 2.9 6.998c0 5.46-4.44 9.66-9.15 9.66zm5.44-7.4c-.298-.15-1.762-.87-2.035-.97-.273-.1-.472-.15-.67.15-.198.298-.767.97-.94 1.168-.173.198-.347.223-.645.075-.298-.15-1.257-.463-2.394-1.475-.885-.79-1.483-1.766-1.657-2.064-.173-.298-.018-.46.13-.61.135-.134.298-.347.446-.52.15-.174.198-.298.298-.497.1-.198.05-.372-.025-.522-.075-.15-.67-1.612-.918-2.207-.242-.582-.487-.503-.67-.512l-.57-.01c-.198 0-.52.075-.793.372-.273.298-1.04 1.016-1.04 2.478 0 1.462 1.065 2.875 1.213 3.073.15.198 2.096 3.2 5.08 4.487.71.306 1.263.489 1.695.626.712.227 1.36.195 1.872.118.571-.085 1.762-.72 2.01-1.415.248-.694.248-1.29.173-1.415-.074-.124-.272-.198-.57-.347z"/>
+        </svg>
+    </a>
+
+    <script>
+        // المنتجات الافتراضية (تُستخدم إذا لم يتم إعداد رابط الشيت في CONFIG.PRODUCTS_API_URL بعد)
+        const DEFAULT_PRODUCTS = [
+            { id: 'mosque', name: 'لافتات المساجد', price: 165, image: 'https://i.imgur.com/kHZ0Vw0.png' },
+            { id: 'shops', name: 'لافتات المنازل والمحلات', price: 135, image: 'https://i.imgur.com/vNOBqje.png' }
+        ];
+
+        function renderProducts(products) {
+            const container = document.getElementById('optionsContainer');
+            container.innerHTML = '';
+
+            products.forEach((p, index) => {
+                const label = document.createElement('label');
+                label.className = 'option-label';
+                label.innerHTML = `
+                    <input type="checkbox" name="sign_type" value="${p.name}" data-price="${p.price}" ${index === 0 ? 'checked' : ''}>
+                    <div class="option-card">
+                        <div class="image-wrapper">
+                            <img src="${p.image}" alt="${p.name}" loading="lazy">
+                        </div>
+                        <h2>${p.name}</h2>
+                        <span class="price">${p.price} د.ل</span>
+                        <div class="custom-radio-circle"></div>
+                    </div>
+                `;
+                container.appendChild(label);
+            });
+
+            // تحديث الإجمالي عند تغيير أي اختيار
+            container.querySelectorAll('input[name="sign_type"]').forEach(input => {
+                input.addEventListener('change', updateTotal);
+            });
+
+            updateTotal();
+        }
+
+        async function loadProducts() {
+            if (CONFIG.PRODUCTS_API_URL && CONFIG.PRODUCTS_API_URL.trim() !== '') {
+                try {
+                    const res = await fetch(CONFIG.PRODUCTS_API_URL);
+                    const data = await res.json();
+                    if (Array.isArray(data) && data.length > 0) {
+                        renderProducts(data);
+                        return;
+                    }
+                } catch (err) {
+                    console.error('تعذّر جلب المنتجات من الشيت، سيتم استخدام المنتجات الافتراضية.', err);
+                }
+            }
+            renderProducts(DEFAULT_PRODUCTS);
+        }
+
+        function getSelectedProducts() {
+            return Array.from(document.querySelectorAll('input[name="sign_type"]:checked')).map(input => ({
+                name: input.value,
+                price: parseFloat(input.dataset.price)
+            }));
+        }
+
+        function updateTotal() {
+            const qty = parseInt(document.getElementById('quantity').value) || 1;
+            const selected = getSelectedProducts();
+            const sum = selected.reduce((acc, p) => acc + p.price, 0);
+            document.getElementById('totalAmount').innerText = (sum * qty) + ' د.ل';
+        }
+
+        function setupWhatsappButton() {
+            const btn = document.getElementById('whatsappBtn');
+            const number = CONFIG.WHATSAPP_NUMBER;
+            btn.href = `https://wa.me/${number}?text=${encodeURIComponent('مرحباً، عندي استفسار بخصوص لافتات الأدعية')}`;
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadProducts();
+            setupWhatsappButton();
+        });
+
+        function increaseQty() {
+            let qtyInput = document.getElementById('quantity');
+            let currentValue = parseInt(qtyInput.value);
+            if (currentValue < 9) {
+                qtyInput.value = currentValue + 1;
+                updateTotal();
+            }
+        }
+
+        function decreaseQty() {
+            let qtyInput = document.getElementById('quantity');
+            let currentValue = parseInt(qtyInput.value);
+            if (currentValue > 1) {
+                qtyInput.value = currentValue - 1;
+                updateTotal();
+            }
+        }
+
+        function handleFormSubmit(event) {
+            event.preventDefault();
+
+            let isValid = true;
+            let nameInput = document.getElementById('fullname');
+            let phoneInput = document.getElementById('phone');
+            let addressInput = document.getElementById('address');
+
+            let nameError = document.getElementById('nameError');
+            let phoneError = document.getElementById('phoneError');
+            let addressError = document.getElementById('addressError');
+            let generalAlert = document.getElementById('generalAlert');
+
+            // إعادة ضبط الأخطاء في البداية
+            generalAlert.style.display = 'none';
+            nameInput.classList.remove('error-input');
+            phoneInput.classList.remove('error-input');
+            addressInput.classList.remove('error-input');
+
+            nameError.style.display = 'none';
+            phoneError.style.display = 'none';
+            addressError.style.display = 'none';
+
+            // التحقق من اختيار نوع لافتة واحد على الأقل
+            const selectedProducts = getSelectedProducts();
+            if (selectedProducts.length === 0) {
+                isValid = false;
+            }
+
+            // 1. التحقق من حقل الاسم
+            if (nameInput.value.trim() === '') {
+                nameInput.classList.add('error-input');
+                nameError.innerText = 'قم بتعبئة الاسم الكامل';
+                nameError.style.display = 'block';
+                isValid = false;
+            }
+
+            // 2. التحقق من حقل رقم الهاتف
+            let phoneVal = phoneInput.value.trim();
+            let phoneRegex1 = /^09\d{8}$/;
+            let phoneRegex2 = /^218\d{9}$/;
+            let phoneRegex3 = /^\+218\d{9}$/;
+
+            if (phoneVal === '') {
+                phoneInput.classList.add('error-input');
+                phoneError.innerText = 'قم بتعبئة رقم الهاتف';
+                phoneError.style.display = 'block';
+                isValid = false;
+            } else if (!phoneRegex1.test(phoneVal) && !phoneRegex2.test(phoneVal) && !phoneRegex3.test(phoneVal)) {
+                phoneInput.classList.add('error-input');
+                phoneError.innerText = 'الرقم غير صحيح. يجب أن يبدأ بـ 09 (10 أرقام) أو 218 / +218';
+                phoneError.style.display = 'block';
+                isValid = false;
+            }
+
+            // 3. التحقق من حقل العنوان
+            if (addressInput.value.trim() === '') {
+                addressInput.classList.add('error-input');
+                addressError.innerText = 'قم بتعبئة العنوان بالتفصيل';
+                addressError.style.display = 'block';
+                isValid = false;
+            }
+
+            // إذا كانت جميع الحقول صحيحة ومكتملة
+            if (isValid) {
+                let submitBtn = document.getElementById('submitBtn');
+                submitBtn.innerText = 'جاري الإرسال...';
+                submitBtn.disabled = true;
+
+                const scriptURL = CONFIG.ORDER_API_URL;
+
+                // كل أنواع اللافتات المختارة (يمكن اختيار أكثر من نوع)
+                const qty = parseInt(document.getElementById('quantity').value) || 1;
+                const productsSum = selectedProducts.reduce((acc, p) => acc + p.price, 0);
+                const total = productsSum * qty;
+
+                const formData = {
+                    product: selectedProducts.map(p => p.name).join('، '),
+                    quantity: qty,
+                    total: total,
+                    name: nameInput.value.trim(),
+                    phone: phoneInput.value.trim(),
+                    address: addressInput.value.trim()
+                };
+
+                fetch(scriptURL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                })
+                .then(response => {
+                    document.getElementById('orderForm').style.display = 'none';
+                    document.querySelector('.after-customer-img').style.display = 'none';
+                    document.querySelector('.bottom-title').style.display = 'none';
+                    document.querySelector('.product-description').style.display = 'none';
+                    document.getElementById('successCard').style.display = 'block';
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+
+                    // تتبع اكتمال الطلب في بكسل الميتا (يعمل تلقائياً بمجرد إضافة META_PIXEL_ID)
+                    if (typeof fbq === 'function' && CONFIG.META_PIXEL_ID) {
+                        fbq('track', 'Lead', { value: total, currency: 'LYD' });
+                    }
+                })
+                .catch(error => {
+                    submitBtn.innerText = 'أطلب الآن';
+                    submitBtn.disabled = false;
+                    generalAlert.innerText = 'حدث خطأ أثناء الإرسال، يرجى المحاولة مرة أخرى.';
+                    generalAlert.style.display = 'block';
+                });
+            } else {
+                generalAlert.innerText = selectedProducts.length === 0
+                    ? 'الرجاء اختيار نوع لافتة واحد على الأقل قبل إتمام الطلب'
+                    : 'يرجى تصحيح الأخطاء وتعبئة جميع الحقول المطلوبة باللون الأحمر';
+                generalAlert.style.display = 'block';
+            }
+        }
+    </script>
+
+</body>
+
+</html>
